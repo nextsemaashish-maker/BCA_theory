@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subject Evaluation &amp; PDF Dossier — EduTrack BCA</title>
+  <meta name="description" content="Subject clearance status, theory &amp; assignment live toggles, curriculum blueprint, and student academic documents." />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="app-header">
+    <div class="container header-content">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a id="backToStudentHeaderBtn" href="student.html?id=1" class="btn btn-outline btn-sm" style="display: flex; align-items: center; gap: 6px;" title="Return to Student Profile">
+          <span>←</span>
+          <span id="backToStudentText">Student</span>
+        </a>
+
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">🎓</div>
+          <div>
+            <h1 class="brand-title">EduTrack</h1>
+            <p class="brand-sub">Subject Portal</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Universal Navigation Menu (Access all pages) -->
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="index.html" id="navHomeLink" class="nav-item-link">
+          <span>🏠</span>
+          <span>Students</span>
+        </a>
+        <a href="student.html?id=1" id="navStudentLink" class="nav-item-link">
+          <span>👨‍🎓</span>
+          <span id="navStudentTitle">Student Profile</span>
+        </a>
+        <a href="subject.html?studentId=1&code=BCS-053" id="navSubjectLink" class="nav-item-link active">
+          <span>📚</span>
+          <span id="navSubjectTitle">Subject Dossier</span>
+        </a>
+      </nav>
+
+      <!-- Quick Switcher Dropdown (Switch student or switch subject) -->
+      <div class="nav-switcher header-switcher">
+        <span style="font-size: 13px;" title="Switch Student Profile">👨‍🎓</span>
+        <select id="navStudentSwitcher" title="Switch Student Profile">
+          <!-- Populated by initUniversalNav -->
+        </select>
+        <span style="color: var(--border); font-size: 12px;">|</span>
+        <span style="font-size: 13px;" title="Switch Subject">📚</span>
+        <select id="navSubjectSwitcher" title="Switch Subject">
+          <!-- Populated by initUniversalNav -->
+        </select>
+      </div>
+
+      <!-- Quick Trailing Info -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="backupNavBtn" class="btn btn-outline btn-sm" title="Backup & Restore JSON Data">
+          <span>💾 Backup / Restore</span>
+        </button>
+        <span class="badge badge-complete">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #34d399; display: inline-block;"></span>
+          <span>Roster Synced</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN WORKSPACE ================= -->
+  <main class="container" style="padding-top: 28px; padding-bottom: 64px;">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="index.html">Students</a>
+      <span>/</span>
+      <a id="breadcrumbStudentLink" href="student.html?id=1">Aashish Kumar</a>
+      <span>/</span>
+      <span id="breadcrumbSubjectCode" style="color: var(--text-primary); font-weight: 600;">BCS-053 Evaluation</span>
+    </nav>
+
+    <!-- ================= SUBJECT HERO SECTION ================= -->
+    <section class="card" style="padding: 28px; margin-bottom: 28px; background: linear-gradient(145deg, rgba(17,24,39,0.95), rgba(13,21,38,0.9));">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+            <span id="heroSubjectCodeBadge" class="badge badge-info" style="font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono'; padding: 4px 12px;">
+              BCS-053
+            </span>
+            <span class="badge" style="background: rgba(10,15,30,0.7); color: var(--text-secondary); border: 1px solid var(--border);">
+              Theory Core Course
+            </span>
+            <span class="badge badge-complete">
+              Enrolled Term: Dec 2024
+            </span>
+          </div>
+
+          <h1 id="heroSubjectName" style="font-size: 28px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; margin-bottom: 8px;">
+            Web Programming
+          </h1>
+
+          <p id="heroSubjectMeta" style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span id="heroCredits">2 Credits</span>
+            <span>•</span>
+            <span id="heroSemester">Semester 5</span>
+            <span>•</span>
+            <span id="heroStudentCandidate">Aashish Kumar</span>
+            <span>•</span>
+            <span style="color: var(--accent-amber);">Course Weightage: 100 Marks</span>
+          </p>
+        </div>
+
+        <!-- Candidate Identity Badge Card -->
+        <div style="background: rgba(10,15,30,0.85); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 20px; min-width: 220px;">
+          <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; display: block;">Candidate Record</span>
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+            <span style="font-size: 20px;">👤</span>
+            <div>
+              <div id="cardCandidateName" style="font-size: 14px; font-weight: 700; color: #fff;">Aashish Kumar</div>
+              <div id="cardCandidateRoll" style="font-size: 11px; font-family: 'JetBrains Mono'; color: #60a5fa;">BCA2022002</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BENTO GRID: STATUS CONTROLS (8 cols) + DEGREE TELEMETRY (4 cols) ================= -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 36px;">
+      
+      <!-- LEFT: Evaluation Status & Academic Clearance -->
+      <div class="card" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">📋</span>
+              <h2 style="font-size: 18px; font-weight: 800; color: #fff;">Evaluation Status &amp; Academic Clearance</h2>
+            </div>
+            <span class="badge" style="background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); font-family: 'JetBrains Mono';">
+              IGNOU 70:30 Rule
+            </span>
+          </div>
+
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-top: 14px; padding: 12px 14px; background: rgba(10,15,30,0.6); border-radius: 8px; border: 1px solid var(--border);">
+            ℹ️ A subject is marked <b style="color: #34d399;">COMPLETED</b> only when both <b style="color: #fff;">Theory (TEE)</b> and <b style="color: #fff;">Assignments (TMA)</b> are cleared with a minimum 40% aggregate score respectively in accordance with university degree audit criteria.
+          </p>
+
+          <!-- Large Interactive Status Toggles with Glowing Neon Borders -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px;">
+            
+            <!-- Theory Toggle Box -->
+            <div id="theoryStatusBox" class="card" style="padding: 16px; background: rgba(13,21,38,0.8);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div>
+                  <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em;">Weightage 70%</span>
+                  <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">Theory Exam (TEE)</h3>
+                  <p style="font-size: 11px; color: var(--text-secondary);">Term-End Written Paper</p>
+                </div>
+                <span style="font-size: 18px;">📝</span>
+              </div>
+
+              <div style="padding-top: 12px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 11px; color: var(--text-muted);">Current Status:</span>
+                <div style="display: flex; gap: 6px;">
+                  <button id="toggleTheoryCompleteBtn" class="toggle-btn" onclick="setSubjectField('theory', 'complete')">
+                    <span>✅ Complete</span>
+                  </button>
+                  <button id="toggleTheoryPendingBtn" class="toggle-btn" onclick="setSubjectField('theory', 'pending')">
+                    <span>⏳ Pending</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Assignment Toggle Box -->
+            <div id="assignStatusBox" class="card" style="padding: 16px; background: rgba(13,21,38,0.8);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div>
+                  <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em;">Weightage 30%</span>
+                  <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">Assignment (TMA)</h3>
+                  <p style="font-size: 11px; color: var(--text-secondary);">Tutor Marked Assignment</p>
+                </div>
+                <span style="font-size: 18px;">📂</span>
+              </div>
+
+              <div style="padding-top: 12px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 11px; color: var(--text-muted);">Current Status:</span>
+                <div style="display: flex; gap: 6px;">
+                  <button id="toggleAssignCompleteBtn" class="toggle-btn" onclick="setSubjectField('assignment', 'complete')">
+                    <span>✅ Complete</span>
+                  </button>
+                  <button id="toggleAssignPendingBtn" class="toggle-btn" onclick="setSubjectField('assignment', 'pending')">
+                    <span>❌ Pending</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Dynamic Overall Clearance Banner -->
+        <div id="overallClearanceBanner" class="card" style="margin-top: 22px; padding: 16px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 14px;">
+          <span id="bannerIcon" style="font-size: 24px;">⚠️</span>
+          <div>
+            <h4 id="bannerTitle" style="font-size: 14px; font-weight: 700; color: #fff;">Clearance Status</h4>
+            <p id="bannerDesc" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Checking records...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Side Progress Telemetry & Degree Metrics -->
+      <div class="card glow-card-blue" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 18px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Progress Telemetry</span>
+            <span class="badge badge-info" style="font-family: 'JetBrains Mono'; font-size: 10px;">BCA 99 CREDITS</span>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <span style="font-size: 11px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase;">Course Contribution</span>
+            <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px;">
+              <span id="telemetryCredits" style="font-size: 34px; font-weight: 800; color: #fff; letter-spacing: -0.02em;">2.0</span>
+              <span style="font-size: 14px; color: var(--text-secondary);">/ 99 Total BCA Credits</span>
+            </div>
+          </div>
+
+          <!-- Overall Degree Completion Bar -->
+          <div style="margin-bottom: 24px; background: rgba(10,15,30,0.6); padding: 14px; border-radius: 10px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+              <span style="color: var(--text-secondary);">Total Degree Completed</span>
+              <span id="degreeClearedText" style="color: #34d399; font-weight: 700; font-family: 'JetBrains Mono';">66.6% (64/96)</span>
+            </div>
+            <div class="progress-track">
+              <div id="degreeClearedBar" class="progress-fill" style="width: 66.6%;"></div>
+            </div>
+          </div>
+
+          <!-- Metrics Table -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(10,15,30,0.7); border-radius: 8px; border: 1px solid var(--border); font-size: 12px;">
+              <span style="color: var(--text-secondary);">Assignment Award (TMA)</span>
+              <span id="metricTmaScore" style="color: #34d399; font-weight: 700; font-family: 'JetBrains Mono';">78 / 100</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(10,15,30,0.7); border-radius: 8px; border: 1px solid var(--border); font-size: 12px;">
+              <span style="color: var(--text-secondary);">TEE Exam Clearance</span>
+              <span id="metricTeeScore" style="color: #fbbf24; font-weight: 700; font-family: 'JetBrains Mono';">Pending Term-End</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(10,15,30,0.7); border-radius: 8px; border: 1px solid var(--border); font-size: 12px;">
+              <span style="color: var(--text-secondary);">Study Center Code</span>
+              <span style="color: #fff; font-weight: 700; font-family: 'JetBrains Mono';">0711 (DESU Delhi)</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding-top: 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 16px;">
+          <span>System Record ID: 502-BCS053</span>
+          <button onclick="renderSubjectPage()" class="btn btn-outline btn-sm" style="font-size: 10px; padding: 4px 8px;">
+            <span>↺ Refresh</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= RELATED DOCUMENTS & RESULTS SECTION ================= -->
+    <section style="margin-bottom: 36px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800; color: #fff;">Related Documents &amp; Verification Files</h2>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+            Official IGNOU grade cards, mark sheets, and study materials for <span id="docsStudentName" style="color: #fff; font-weight: 600;">Aashish Kumar</span>.
+          </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge badge-info font-mono" style="font-size: 11px;">📂 Directory: ../Aashish Document/</span>
+        </div>
+      </div>
+
+      <!-- Grid of 3 per row as requested -->
+      <div id="relatedDocsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+        <!-- Injected by JS -->
+      </div>
+    </section>
+
+    <!-- ================= MODULAR SYLLABUS BLUEPRINT ================= -->
+    <section class="card" style="padding: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 id="blueprintTitle" style="font-size: 17px; font-weight: 800; color: #fff;">Modular Syllabus Blueprint</h3>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+            Distance learning units structured for self-directed terminal examination and lab preparation.
+          </p>
+        </div>
+        <span id="blueprintCodeBadge" class="badge badge-info font-mono">BCS-053</span>
+      </div>
+
+      <div id="blueprintContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
+        <!-- Injected by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared App JS -->
+  <script src="./app.js"></script>
+
+  <!-- Page 3 Interactive Script -->
+  <script>
+    let appDB = loadDB();
+
+    // Read parameters:
+    const params = new URLSearchParams(window.location.search);
+    const studentId = parseInt(params.get('student'), 10) || 1;
+    const subjectCode = params.get('subject') || 'BCS-053';
+
+    let currentStudent = appDB.students.find(s => s.id === studentId);
+    if (!currentStudent && appDB.students.length > 0) {
+      currentStudent = appDB.students[0];
+    }
+
+    // Find Subject Details across all BCA semesters
+    let subjectMeta = null;
+    let subjectSem = currentStudent ? currentStudent.semester : 5;
+
+    for (const sem in BCA_SUBJECTS) {
+      const found = BCA_SUBJECTS[sem].find(s => s.code === subjectCode);
+      if (found) {
+        subjectMeta = found;
+        subjectSem = parseInt(sem, 10);
+        break;
+      }
+    }
+
+    if (!subjectMeta) {
+      // Fallback if code not recognized
+      subjectMeta = { code: subjectCode, name: 'Web Programming', credits: 2, type: 'Theory' };
+    }
+
+    function renderSubjectPage() {
+      if (!currentStudent) {
+        alert("Student record not found. Redirecting to directory.");
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Sync active student data
+      currentStudent = appDB.students.find(s => s.id === studentId) || currentStudent;
+
+      // Ensure subject record exists
+      if (!currentStudent.subjects) currentStudent.subjects = {};
+      if (!currentStudent.subjects[subjectCode]) {
+        currentStudent.subjects[subjectCode] = { theory: 'pending', assignment: 'pending' };
+      }
+
+      renderHeroAndHeader();
+      renderStatusToggles();
+      renderRelatedDocs();
+      renderSyllabusBlueprint();
+    }
+
+    function renderHeroAndHeader() {
+      // Top back button
+      const backHeaderBtn = document.getElementById('backToStudentHeaderBtn');
+      if (backHeaderBtn) backHeaderBtn.href = `student.html?id=${currentStudent.id}`;
+      const backText = document.getElementById('backToStudentText');
+      if (backText) backText.textContent = `Back to ${currentStudent.name.split(' ')[0] || 'Student'}`;
+
+      const bcLink = document.getElementById('breadcrumbStudentLink');
+      if (bcLink) {
+        bcLink.href = `student.html?id=${currentStudent.id}`;
+        bcLink.textContent = currentStudent.name;
+      }
+      const bcSubject = document.getElementById('breadcrumbSubjectCode');
+      if (bcSubject) bcSubject.textContent = `${subjectMeta.code} Evaluation`;
+
+      // Hero
+      document.getElementById('heroSubjectCodeBadge').textContent = subjectMeta.code;
+      document.getElementById('heroSubjectName').textContent = subjectMeta.name;
+      document.getElementById('heroCredits').textContent = `${subjectMeta.credits} Credits`;
+      document.getElementById('heroSemester').textContent = `Semester ${subjectSem}`;
+      document.getElementById('heroStudentCandidate').textContent = currentStudent.name;
+
+      // Candidate Card
+      document.getElementById('cardCandidateName').textContent = currentStudent.name;
+      document.getElementById('cardCandidateRoll').textContent = currentStudent.enrollment;
+      document.getElementById('docsStudentName').textContent = currentStudent.name;
+
+      // Telemetry
+      document.getElementById('telemetryCredits').textContent = `${subjectMeta.credits}.0`;
+
+      // Global student stats for degree cleared bar
+      const studentStats = getStats(currentStudent);
+      const degreePct = studentStats.pct;
+      document.getElementById('degreeClearedText').textContent = `${degreePct}% (${studentStats.fullyComplete}/${studentStats.total} modules)`;
+      document.getElementById('degreeClearedBar').style.width = `${degreePct}%`;
+    }
+
+    function renderStatusToggles() {
+      const st = currentStudent.subjects[subjectCode] || { theory: 'pending', assignment: 'pending' };
+      const isThDone = st.theory === 'complete';
+      const isAsDone = st.assignment === 'complete';
+
+      // Theory buttons
+      const thCompBtn = document.getElementById('toggleTheoryCompleteBtn');
+      const thPendBtn = document.getElementById('toggleTheoryPendingBtn');
+      const thBox = document.getElementById('theoryStatusBox');
+
+      if (isThDone) {
+        thCompBtn.className = 'toggle-btn active-complete';
+        thPendBtn.className = 'toggle-btn';
+        thBox.style.borderColor = 'rgba(16,185,129,0.5)';
+        thBox.style.boxShadow = 'var(--shadow-green)';
+        document.getElementById('metricTeeScore').textContent = '✅ Cleared (71/100)';
+        document.getElementById('metricTeeScore').style.color = '#34d399';
+      } else {
+        thCompBtn.className = 'toggle-btn';
+        thPendBtn.className = 'toggle-btn active-pending-theory';
+        thBox.style.borderColor = 'rgba(245,158,11,0.5)';
+        thBox.style.boxShadow = 'var(--shadow-amber)';
+        document.getElementById('metricTeeScore').textContent = '⏳ Pending (TEE Dec)';
+        document.getElementById('metricTeeScore').style.color = '#fbbf24';
+      }
+
+      // Assignment buttons
+      const asCompBtn = document.getElementById('toggleAssignCompleteBtn');
+      const asPendBtn = document.getElementById('toggleAssignPendingBtn');
+      const asBox = document.getElementById('assignStatusBox');
+
+      if (isAsDone) {
+        asCompBtn.className = 'toggle-btn active-complete';
+        asPendBtn.className = 'toggle-btn';
+        asBox.style.borderColor = 'rgba(16,185,129,0.5)';
+        asBox.style.boxShadow = 'var(--shadow-green)';
+        document.getElementById('metricTmaScore').textContent = '✅ Cleared (78/100)';
+        document.getElementById('metricTmaScore').style.color = '#34d399';
+      } else {
+        asCompBtn.className = 'toggle-btn';
+        asPendBtn.className = 'toggle-btn active-pending-assign';
+        asBox.style.borderColor = 'rgba(239,68,68,0.5)';
+        asBox.style.boxShadow = 'var(--shadow-red)';
+        document.getElementById('metricTmaScore').textContent = '❌ Pending Submission';
+        document.getElementById('metricTmaScore').style.color = '#f87171';
+      }
+
+      // Dynamic Banner
+      const banner = document.getElementById('overallClearanceBanner');
+      const bannerIcon = document.getElementById('bannerIcon');
+      const bannerTitle = document.getElementById('bannerTitle');
+      const bannerDesc = document.getElementById('bannerDesc');
+
+      if (isThDone && isAsDone) {
+        banner.style.background = 'rgba(16,185,129,0.12)';
+        banner.style.borderColor = 'rgba(16,185,129,0.4)';
+        banner.style.boxShadow = 'var(--shadow-green)';
+        bannerIcon.textContent = '✅';
+        bannerTitle.textContent = `COURSE COMPLETED — ${subjectMeta.credits} Credits Cleared`;
+        bannerTitle.style.color = '#34d399';
+        bannerDesc.textContent = `Both Theory (TEE) and Assignments (TMA) are officially verified and cleared for ${currentStudent.name}. ${subjectMeta.credits} credits contributed to degree audit.`;
+      } else if (!isThDone && isAsDone) {
+        banner.style.background = 'rgba(245,158,11,0.12)';
+        banner.style.borderColor = 'rgba(245,158,11,0.4)';
+        banner.style.boxShadow = 'var(--shadow-amber)';
+        bannerIcon.textContent = '⚠️';
+        bannerTitle.textContent = 'Theory Pending (TEE Exam)';
+        bannerTitle.style.color = '#fbbf24';
+        bannerDesc.textContent = 'Assignment (TMA) submitted and verified. Term-End written exam is awaiting clearance. Credits will unlock upon TEE result publication.';
+      } else if (isThDone && !isAsDone) {
+        banner.style.background = 'rgba(245,158,11,0.12)';
+        banner.style.borderColor = 'rgba(245,158,11,0.4)';
+        banner.style.boxShadow = 'var(--shadow-amber)';
+        bannerIcon.textContent = '📝';
+        bannerTitle.textContent = 'Assignment Pending (TMA Submission)';
+        bannerTitle.style.color = '#fbbf24';
+        bannerDesc.textContent = 'Written theory exam cleared, but tutor marked assignment (TMA) report is pending submission or not updated on regional grade card.';
+      } else {
+        banner.style.background = 'rgba(239,68,68,0.12)';
+        banner.style.borderColor = 'rgba(239,68,68,0.4)';
+        banner.style.boxShadow = 'var(--shadow-red)';
+        bannerIcon.textContent = '❌';
+        bannerTitle.textContent = 'Both Theory & Assignment Pending';
+        bannerTitle.style.color = '#f87171';
+        bannerDesc.textContent = 'Neither Theory nor Assignment has cleared for this semester. Learner must submit TMA and register for TEE to clear course.';
+      }
+    }
+
+    window.setSubjectField = function(field, value) {
+      if (!currentStudent.subjects) currentStudent.subjects = {};
+      if (!currentStudent.subjects[subjectCode]) {
+        currentStudent.subjects[subjectCode] = { theory: 'pending', assignment: 'pending' };
+      }
+
+      currentStudent.subjects[subjectCode][field] = value;
+      saveDB(appDB);
+
+      renderStatusToggles();
+      const label = field === 'theory' ? 'Theory' : 'Assignment';
+      const icon = value === 'complete' ? '✅' : '⏳';
+      showToast(`${icon} ${subjectCode} ${label} updated to ${value}!`);
+    };
+
+    function renderRelatedDocs() {
+      const grid = document.getElementById('relatedDocsGrid');
+      grid.innerHTML = '';
+      const docs = currentStudent.documents || [];
+
+      if (docs.length === 0) {
+        grid.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; padding: 24px; text-align: center; color: var(--text-secondary);">
+            No documents attached for this student. Return to Student Profile to attach PDFs.
+          </div>
+        `;
+        return;
+      }
+
+      docs.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'card pdf-card';
+        const fileName = doc.file ? doc.file.split('/').pop() : 'Document.pdf';
+
+        card.innerHTML = `
+          <div>
+            <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(239,68,68,0.15); color: #f87171; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px;">
+              📋
+            </div>
+            <h4 style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px;">
+              ${doc.label}
+            </h4>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
+              PDF Verification Document
+            </p>
+            <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-muted); background: rgba(10,15,30,0.7); padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border); word-break: break-all;">
+              ${fileName}
+            </div>
+          </div>
+
+          <div style="padding-top: 12px; border-top: 1px solid var(--border);">
+            <button 
+              onclick="openPDF('${doc.file}', '${doc.label}')"
+              class="btn btn-primary"
+              style="width: 100%; font-size: 12px; padding: 8px;"
+            >
+              <span>📂 Open PDF</span>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderSyllabusBlueprint() {
+      document.getElementById('blueprintTitle').textContent = `${subjectMeta.code} Modular Syllabus Blueprint`;
+      document.getElementById('blueprintCodeBadge').textContent = subjectMeta.code;
+
+      const container = document.getElementById('blueprintContainer');
+      container.innerHTML = '';
+
+      const blocks = subjectMeta.blocks || [
+        {
+          title: 'Block 1: Foundational Architecture & Core Concepts',
+          units: [
+            'Unit 1: Fundamentals, architectural models & protocols',
+            'Unit 2: Core structures, syntactic rules & runtime lifecycle',
+            'Unit 3: Applied patterns, debugging & error handling'
+          ]
+        },
+        {
+          title: 'Block 2: Advanced Implementations & Terminal Exam Syllabus',
+          units: [
+            'Unit 1: Advanced libraries, API integration & data persistence',
+            'Unit 2: Performance optimization, benchmarks & test strategies',
+            'Unit 3: Security invariants, terminal exam revision & review'
+          ]
+        }
+      ];
+
+      blocks.forEach((block, idx) => {
+        const box = document.createElement('div');
+        box.style.background = 'rgba(10,15,30,0.6)';
+        box.style.border = '1px solid var(--border)';
+        box.style.borderRadius = '10px';
+        box.style.padding = '16px';
+
+        const unitsListHtml = block.units.map(u => `
+          <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.5;">
+            <span style="color: var(--accent-blue); font-weight: bold; margin-top: 2px;">•</span>
+            <span>${u}</span>
+          </li>
+        `).join('');
+
+        box.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+            <h4 style="font-size: 13px; font-weight: 700; color: #fff;">${block.title}</h4>
+            <span class="badge ${idx === 0 ? 'badge-complete' : 'badge-warning'}" style="font-size: 10px;">
+              ${idx === 0 ? 'TMA Covered' : 'TEE Focus'}
+            </span>
+          </div>
+          <ul style="list-style: none;">
+            ${unitsListHtml}
+          </ul>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    // Backup & Restore Dialog Trigger
+    document.getElementById('backupNavBtn').addEventListener('click', () => {
+      openBackupModal('export');
+    });
+
+    // Initial load
+    renderSubjectPage();
+    initUniversalNav('subject');
+  </script>
+
+  <!-- Universal Mobile Bottom Navigation Bar -->
+  <nav class="mobile-nav-bar" aria-label="Mobile Navigation">
+    <a href="index.html" id="mobNavHome" class="mobile-nav-btn">
+      <span style="font-size: 18px;">🏠</span>
+      <span>Students</span>
+    </a>
+    <a href="student.html" id="mobNavStudent" class="mobile-nav-btn">
+      <span style="font-size: 18px;">👨‍🎓</span>
+      <span>Profile</span>
+    </a>
+    <a href="subject.html" id="mobNavSubject" class="mobile-nav-btn active">
+      <span style="font-size: 18px;">📚</span>
+      <span>Subject</span>
+    </a>
+    <button id="mobNavBackup" class="mobile-nav-btn" onclick="openBackupModal('export')">
+      <span style="font-size: 18px;">💾</span>
+      <span>Backup</span>
+    </button>
+  </nav>
+</body>
+</html>

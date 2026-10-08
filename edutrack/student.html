@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Profile — EduTrack BCA</title>
+  <meta name="description" content="Detailed BCA student progress, theory and assignment status, and local academic documents." />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="app-header">
+    <div class="container header-content">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">🎓</div>
+          <div>
+            <h1 class="brand-title">EduTrack</h1>
+            <p class="brand-sub">Student Academic Dossier</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Universal Navigation Menu (Access all pages) -->
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="index.html" id="navHomeLink" class="nav-item-link">
+          <span>🏠</span>
+          <span>Students</span>
+        </a>
+        <a href="student.html?id=1" id="navStudentLink" class="nav-item-link active">
+          <span>👨‍🎓</span>
+          <span id="navStudentTitle">Student Profile</span>
+        </a>
+        <a href="subject.html?studentId=1&code=BCS-053" id="navSubjectLink" class="nav-item-link">
+          <span>📚</span>
+          <span id="navSubjectTitle">Subject Dossier</span>
+        </a>
+      </nav>
+
+      <!-- Quick Switcher Dropdown (Switch student or jump directly to subject) -->
+      <div class="nav-switcher header-switcher">
+        <span style="font-size: 13px;" title="Switch Student Profile">👨‍🎓</span>
+        <select id="navStudentSwitcher" title="Switch Student Profile">
+          <!-- Populated by initUniversalNav -->
+        </select>
+        <span style="color: var(--border); font-size: 12px;">|</span>
+        <span style="font-size: 13px;" title="Jump directly to Subject Dossier">📚</span>
+        <select id="navSubjectSwitcher" title="Jump directly to Subject">
+          <!-- Populated by initUniversalNav -->
+        </select>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="backupNavBtn" class="btn btn-outline btn-sm" title="Backup & Restore JSON Data">
+          <span>💾 Backup / Restore</span>
+        </button>
+        <button id="editStudentBtn" class="btn btn-outline btn-sm">
+          <span>✏️ Edit</span>
+        </button>
+        <button id="deleteStudentBtn" class="btn btn-outline btn-sm" style="color: #f87171; border-color: rgba(239,68,68,0.4);">
+          <span>🗑️ Delete</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN WORKSPACE ================= -->
+  <main class="container" style="padding-top: 28px; padding-bottom: 64px;">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="index.html">← Back to Students Directory</a>
+      <span>/</span>
+      <span id="breadcrumbStudentName" style="color: var(--text-primary); font-weight: 600;">Student Profile</span>
+    </nav>
+
+    <!-- ================= HERO SECTION ================= -->
+    <section id="studentHeroCard" class="card" style="padding: 28px; margin-bottom: 28px; background: linear-gradient(145deg, rgba(17,24,39,0.95), rgba(13,21,38,0.9));">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        
+        <!-- Left: Large Avatar Circle + Student Info -->
+        <div style="display: flex; align-items: center; gap: 22px; flex-wrap: wrap;">
+          <div id="heroAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; color: #ffffff; box-shadow: 0 0 30px rgba(59, 130, 246, 0.45); flex-shrink: 0;">
+            AK
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <h1 id="heroStudentName" style="font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">
+                Aashish Kumar
+              </h1>
+              <span id="heroSemBadge" class="badge badge-info">Semester 5</span>
+              <span class="badge badge-complete">Active Enrolled</span>
+            </div>
+
+            <p id="heroMetaLine" style="font-size: 13px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span>BCA</span>
+              <span>•</span>
+              <span id="heroSemesterText">Semester 5</span>
+              <span>•</span>
+              <span id="heroEnrollmentText" style="font-family: 'JetBrains Mono'; color: #60a5fa; font-weight: 600;">BCA2022002</span>
+            </p>
+
+            <p id="heroContactLine" style="font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <!-- Injected by JS -->
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Progress Circle / Mini Clearance Card -->
+        <div style="background: rgba(10,15,30,0.8); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+          <div>
+            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; display: block;">Clearance Status</span>
+            <span id="heroClearanceText" style="font-size: 18px; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono';">6/8 (75%)</span>
+          </div>
+          <div id="heroPctBadge" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #34d399; box-shadow: 0 0 16px rgba(16,185,129,0.25);">
+            75%
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 Metric Stat Cards / Pills in Hero -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(30,45,74,0.6);">
+        <div style="background: rgba(10,15,30,0.6); padding: 12px; border-radius: 10px; border: 1px solid var(--border); text-align: center;">
+          <span style="font-size: 11px; color: var(--text-secondary); display: block;">Total Subjects</span>
+          <span id="pillTotal" style="font-size: 18px; font-weight: 800; color: #ffffff;">8</span>
+        </div>
+        <div style="background: rgba(10,15,30,0.6); padding: 12px; border-radius: 10px; border: 1px solid rgba(16,185,129,0.3); text-align: center;">
+          <span style="font-size: 11px; color: #34d399; display: block;">✅ Completed</span>
+          <span id="pillComplete" style="font-size: 18px; font-weight: 800; color: #34d399;">6</span>
+        </div>
+        <div style="background: rgba(10,15,30,0.6); padding: 12px; border-radius: 10px; border: 1px solid rgba(245,158,11,0.3); text-align: center;">
+          <span style="font-size: 11px; color: #fbbf24; display: block;">⚠️ Theory Pending</span>
+          <span id="pillTheory" style="font-size: 18px; font-weight: 800; color: #fbbf24;">2</span>
+        </div>
+        <div style="background: rgba(10,15,30,0.6); padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); text-align: center;">
+          <span style="font-size: 11px; color: #f87171; display: block;">❌ Assign Pending</span>
+          <span id="pillAssign" style="font-size: 18px; font-weight: 800; color: #f87171;">1</span>
+        </div>
+        <div style="background: rgba(10,15,30,0.6); padding: 12px; border-radius: 10px; border: 1px solid rgba(59,130,246,0.3); text-align: center;">
+          <span style="font-size: 11px; color: #60a5fa; display: block;">📊 Clearance %</span>
+          <span id="pillPct" style="font-size: 18px; font-weight: 800; color: #60a5fa;">75%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TWO TABS ================= -->
+    <div class="tabs-nav" style="margin-bottom: 24px;">
+      <button id="tabSubjectsBtn" class="tab-btn active">
+        <span>📚 Subjects</span>
+        <span id="tabSubjectCount" class="badge badge-info" style="font-size: 10px; padding: 2px 6px;">8</span>
+      </button>
+      <button id="tabDocsBtn" class="tab-btn">
+        <span>📄 Documents &amp; Results</span>
+        <span id="tabDocCount" class="badge badge-info" style="font-size: 10px; padding: 2px 6px;">6</span>
+      </button>
+    </div>
+
+    <!-- ================= TAB 1: SUBJECTS BREAKDOWN ================= -->
+    <section id="tabSubjectsContent" class="space-y-4">
+      
+      <!-- Filter and Semester Bar -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800; color: #fff;">Semester Prescribed Modules</h2>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+            Click subject title to open full module study view. Click toggles to instantly update clearance.
+          </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 6px; background: rgba(17,24,39,0.8); border: 1px solid var(--border); padding: 6px 12px; border-radius: var(--radius-sm);">
+            <label for="semSelector" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Viewing Sem:</label>
+            <select id="semSelector" class="form-select" style="padding: 2px 8px; width: auto; font-size: 12px; border: none; background: transparent; color: var(--accent-blue); font-weight: 700;">
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subject List Container -->
+      <div id="subjectsListContainer" style="display: flex; flex-direction: column; gap: 14px;">
+        <!-- Injected by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: DOCUMENTS & RESULTS ================= -->
+    <section id="tabDocsContent" style="display: none;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800; color: #fff;">Verified Academic Documents &amp; Results</h2>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+            Local synchronized IGNOU term-end marksheets, grade cards, and hall tickets.
+          </p>
+        </div>
+
+        <button id="openAddDocModalBtn" class="btn btn-primary btn-sm">
+          <span>+ Attach PDF File</span>
+        </button>
+      </div>
+
+      <!-- PDF Card Grid -->
+      <div id="pdfCardsGrid" class="pdf-grid">
+        <!-- Injected by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= EDIT STUDENT MODAL ================= -->
+  <div id="editStudentModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 17px; font-weight: 800; color: #fff;">Edit Student Profile</h3>
+        <button id="closeEditModalBtn" style="background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <form id="editStudentForm">
+        <div class="form-group">
+          <label class="form-label" for="editName">Full Name *</label>
+          <input id="editName" type="text" class="form-input" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editEnrollment">Enrollment Number *</label>
+          <input id="editEnrollment" type="text" class="form-input" required font-family="JetBrains Mono" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="editSemester">Assigned Semester *</label>
+            <select id="editSemester" class="form-select" required>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editContact">Contact Info</label>
+            <input id="editContact" type="text" class="form-input" />
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" id="cancelEditBtn" class="btn btn-outline">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= ATTACH PDF MODAL ================= -->
+  <div id="addDocModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 17px; font-weight: 800; color: #fff;">Attach Local PDF Document</h3>
+        <button id="closeAddDocModalBtn" style="background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <form id="addDocForm">
+        <div class="form-group">
+          <label class="form-label" for="docLabelInput">Document Title / Result Label *</label>
+          <input id="docLabelInput" type="text" class="form-input" placeholder="e.g. 5th Sem IGNOU Result" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="docFileInput">File Relative Path / Name *</label>
+          <input id="docFileInput" type="text" class="form-input" placeholder="e.g. ../Aashish Document/5th IGNOU TERM-END RESULTS.pdf" required style="font-family: 'JetBrains Mono';" />
+          <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
+            Relative path to your local folder, e.g. <code style="color: #60a5fa;">../Aashish Document/result.pdf</code>
+          </span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" id="cancelAddDocBtn" class="btn btn-outline">Cancel</button>
+          <button type="submit" class="btn btn-primary">Attach Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared App JS -->
+  <script src="./app.js"></script>
+
+  <!-- Page 2 Interactive Script -->
+  <script>
+    let appDB = loadDB();
+
+    // Read student id from URL: new URLSearchParams(location.search).get('id')
+    const urlParams = new URLSearchParams(window.location.search);
+    let studentId = parseInt(urlParams.get('id'), 10) || 1;
+
+    let currentStudent = appDB.students.find(s => s.id === studentId);
+    if (!currentStudent && appDB.students.length > 0) {
+      currentStudent = appDB.students[0];
+      studentId = currentStudent.id;
+    }
+
+    let activeSem = currentStudent ? currentStudent.semester : 5;
+
+    function renderStudentPage() {
+      if (!currentStudent) {
+        alert("Student record not found. Redirecting to home.");
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Sync active student from DB
+      currentStudent = appDB.students.find(s => s.id === studentId);
+      renderHero();
+      renderSubjects();
+      renderDocs();
+    }
+
+    function renderHero() {
+      const stats = getStats(currentStudent);
+      const initials = getInitials(currentStudent.name);
+      const color = getColor(currentStudent.colorIdx || 0);
+
+      document.getElementById('breadcrumbStudentName').textContent = currentStudent.name;
+      document.getElementById('heroStudentName').textContent = currentStudent.name;
+      document.getElementById('heroAvatar').textContent = initials;
+      document.getElementById('heroAvatar').style.background = color;
+      document.getElementById('heroAvatar').style.boxShadow = `0 0 28px ${color}66`;
+
+      document.getElementById('heroSemBadge').textContent = `Semester ${currentStudent.semester}`;
+      document.getElementById('heroSemesterText').textContent = `Semester ${currentStudent.semester}`;
+      document.getElementById('heroEnrollmentText').textContent = currentStudent.enrollment;
+
+      const contactLine = document.getElementById('heroContactLine');
+      contactLine.innerHTML = `
+        <span>📧 ${currentStudent.email || (currentStudent.name.toLowerCase().replace(/\\s+/g, '.') + '@ignou.ac.in')}</span>
+        <span>•</span>
+        <span>📞 ${currentStudent.contact || '+91 98765 43210'}</span>
+        <span>•</span>
+        <span>🏛️ ${currentStudent.center || 'Study Center RC-0731'}</span>
+      `;
+
+      document.getElementById('heroClearanceText').textContent = `${stats.fullyComplete}/${stats.total} (${stats.pct}%)`;
+      document.getElementById('heroPctBadge').textContent = `${stats.pct}%`;
+      document.getElementById('heroPctBadge').style.borderColor = stats.pct === 100 ? '#10b981' : '#3b82f6';
+      document.getElementById('heroPctBadge').style.color = stats.pct === 100 ? '#34d399' : '#60a5fa';
+
+      document.getElementById('pillTotal').textContent = stats.total;
+      document.getElementById('pillComplete').textContent = stats.fullyComplete;
+      document.getElementById('pillTheory').textContent = stats.theoryPending;
+      document.getElementById('pillAssign').textContent = stats.assignPending;
+      document.getElementById('pillPct').textContent = `${stats.pct}%`;
+
+      document.getElementById('semSelector').value = activeSem;
+    }
+
+    function renderSubjects() {
+      const list = getSubjects(activeSem);
+      const container = document.getElementById('subjectsListContainer');
+      container.innerHTML = '';
+      document.getElementById('tabSubjectCount').textContent = list.length;
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="padding: 32px; text-align: center; color: var(--text-secondary);">
+            No subjects configured for Semester ${activeSem}.
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(sub => {
+        if (!currentStudent.subjects) currentStudent.subjects = {};
+        if (!currentStudent.subjects[sub.code]) {
+          currentStudent.subjects[sub.code] = { theory: 'pending', assignment: 'pending' };
+        }
+
+        const st = currentStudent.subjects[sub.code];
+        const isThDone = st.theory === 'complete';
+        const isAsDone = st.assignment === 'complete';
+        const isFullyDone = isThDone && isAsDone;
+
+        let statusClass = 'status-complete';
+        if (!isThDone && isAsDone) statusClass = 'status-theory-pending';
+        else if (isThDone && !isAsDone) statusClass = 'status-assign-pending';
+        else if (!isThDone && !isAsDone) statusClass = 'status-theory-pending';
+
+        const row = document.createElement('div');
+        row.className = `subject-row ${statusClass}`;
+
+        row.innerHTML = `
+          <div style="flex: 1; min-width: 260px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span style="font-size: 16px;">${isFullyDone ? '✅' : (isThDone ? '⚠️' : (isAsDone ? '📝' : '⏳'))}</span>
+              <span class="badge badge-info" style="font-family: 'JetBrains Mono'; font-weight: 700;">${sub.code}</span>
+              <span class="badge" style="background: rgba(10,15,30,0.6); color: var(--text-secondary); border: 1px solid var(--border);">
+                ${sub.credits} Credits
+              </span>
+              ${sub.type === 'Lab' ? '<span class="badge" style="background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3);">Lab Practical</span>' : ''}
+            </div>
+
+            <!-- Clicking subject row title/code opens subject.html?student=ID&subject=CODE in new tab -->
+            <h4 class="subject-title-link" style="font-size: 15px; font-weight: 700; color: #ffffff; margin-top: 6px; cursor: pointer; display: inline-block;">
+              ${sub.name}
+            </h4>
+          </div>
+
+          <!-- Dual Toggle Buttons & Open Detail Link -->
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <!-- Theory Toggle -->
+            <button 
+              onclick="toggleSubjectState('${sub.code}', 'theory')"
+              class="toggle-btn ${isThDone ? 'active-complete' : 'active-pending-theory'}"
+              title="Click to toggle Theory status"
+            >
+              <span>Theory:</span>
+              <span>${isThDone ? '✅ Complete' : '⏳ Pending'}</span>
+            </button>
+
+            <!-- Assignment Toggle -->
+            <button 
+              onclick="toggleSubjectState('${sub.code}', 'assignment')"
+              class="toggle-btn ${isAsDone ? 'active-complete' : 'active-pending-assign'}"
+              title="Click to toggle Assignment status"
+            >
+              <span>Assignment:</span>
+              <span>${isAsDone ? '✅ Complete' : '❌ Pending'}</span>
+            </button>
+
+            <!-- Open Subject Detail Button (Opens subject.html?student=ID&subject=CODE in new tab) -->
+            <button 
+              onclick="openSubjectPage('${sub.code}')" 
+              class="btn btn-outline btn-sm"
+              style="font-size: 11px; padding: 6px 12px; margin-left: 4px;"
+            >
+              <span>Details &rarr;</span>
+            </button>
+          </div>
+        `;
+
+        // Click on title opens subject page
+        row.querySelector('.subject-title-link').addEventListener('click', () => {
+          openSubjectPage(sub.code);
+        });
+
+        container.appendChild(row);
+      });
+    }
+
+    function openSubjectPage(code) {
+      window.open(`subject.html?student=${currentStudent.id}&subject=${code}`, '_blank');
+    }
+
+    window.toggleSubjectState = function(code, field) {
+      if (!currentStudent.subjects[code]) {
+        currentStudent.subjects[code] = { theory: 'pending', assignment: 'pending' };
+      }
+      const cur = currentStudent.subjects[code][field];
+      const next = cur === 'complete' ? 'pending' : 'complete';
+      currentStudent.subjects[code][field] = next;
+
+      saveDB(appDB);
+      renderHero();
+      renderSubjects();
+
+      const label = field === 'theory' ? 'Theory' : 'Assignment';
+      const icon = next === 'complete' ? '✅' : '⚠️';
+      showToast(`${icon} ${code} ${label} updated to ${next}!`);
+    };
+
+    function renderDocs() {
+      const grid = document.getElementById('pdfCardsGrid');
+      grid.innerHTML = '';
+      const docs = currentStudent.documents || [];
+      document.getElementById('tabDocCount').textContent = docs.length;
+
+      if (docs.length === 0) {
+        grid.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-secondary);">
+            <div style="font-size: 32px; margin-bottom: 8px;">📂</div>
+            <p>No PDF documents attached for ${currentStudent.name} yet.</p>
+            <button onclick="document.getElementById('addDocModal').classList.add('open')" class="btn btn-primary btn-sm" style="margin-top: 14px;">
+              <span>+ Attach First PDF</span>
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      docs.forEach((doc, idx) => {
+        const card = document.createElement('div');
+        card.className = 'pdf-card';
+
+        const fileName = doc.file ? doc.file.split('/').pop() : 'Document.pdf';
+
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(239,68,68,0.15); color: #f87171; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                📋
+              </div>
+              <button 
+                onclick="removeDocument(${idx})"
+                style="background: transparent; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; padding: 4px;"
+                title="Remove document reference"
+              >
+                🗑️
+              </button>
+            </div>
+
+            <h3 style="font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">
+              ${doc.label}
+            </h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+              PDF Document
+            </p>
+            <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-muted); background: rgba(10,15,30,0.7); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); word-break: break-all;">
+              ${fileName}
+            </div>
+          </div>
+
+          <!-- Open PDF Button opens file in new tab as specified -->
+          <div style="padding-top: 14px; border-top: 1px solid rgba(30,45,74,0.6);">
+            <button 
+              onclick="openPDF('${doc.file}', '${doc.label}')" 
+              class="btn btn-primary" 
+              style="width: 100%; font-size: 12px;"
+            >
+              <span>📂 Open PDF</span>
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    window.removeDocument = function(idx) {
+      if (confirm('Remove this document reference?')) {
+        currentStudent.documents.splice(idx, 1);
+        saveDB(appDB);
+        renderDocs();
+        showToast('Document reference removed.', '🗑️');
+      }
+    };
+
+    // Tab Switching
+    const tabSubjectsBtn = document.getElementById('tabSubjectsBtn');
+    const tabDocsBtn = document.getElementById('tabDocsBtn');
+    const tabSubjectsContent = document.getElementById('tabSubjectsContent');
+    const tabDocsContent = document.getElementById('tabDocsContent');
+
+    tabSubjectsBtn.addEventListener('click', () => {
+      tabSubjectsBtn.classList.add('active');
+      tabDocsBtn.classList.remove('active');
+      tabSubjectsContent.style.display = 'block';
+      tabDocsContent.style.display = 'none';
+    });
+
+    tabDocsBtn.addEventListener('click', () => {
+      tabDocsBtn.classList.add('active');
+      tabSubjectsBtn.classList.remove('active');
+      tabDocsContent.style.display = 'block';
+      tabSubjectsContent.style.display = 'none';
+    });
+
+    // Semester Selector Change
+    document.getElementById('semSelector').addEventListener('change', (e) => {
+      activeSem = parseInt(e.target.value, 10);
+      renderSubjects();
+    });
+
+    // Edit Student Modal
+    const editModal = document.getElementById('editStudentModal');
+    document.getElementById('editStudentBtn').addEventListener('click', () => {
+      document.getElementById('editName').value = currentStudent.name;
+      document.getElementById('editEnrollment').value = currentStudent.enrollment;
+      document.getElementById('editSemester').value = currentStudent.semester;
+      document.getElementById('editContact').value = currentStudent.contact || '';
+      editModal.classList.add('open');
+    });
+
+    document.getElementById('closeEditModalBtn').addEventListener('click', () => editModal.classList.remove('open'));
+    document.getElementById('cancelEditBtn').addEventListener('click', () => editModal.classList.remove('open'));
+
+    document.getElementById('editStudentForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      currentStudent.name = document.getElementById('editName').value.trim();
+      currentStudent.enrollment = document.getElementById('editEnrollment').value.trim();
+      currentStudent.semester = parseInt(document.getElementById('editSemester').value, 10);
+      currentStudent.contact = document.getElementById('editContact').value.trim();
+      activeSem = currentStudent.semester;
+
+      saveDB(appDB);
+      editModal.classList.remove('open');
+      renderStudentPage();
+      showToast('Student profile updated!', '✏️');
+    });
+
+    // Delete Student Action
+    document.getElementById('deleteStudentBtn').addEventListener('click', () => {
+      if (confirm(`Are you sure you want to delete ${currentStudent.name}? This action cannot be undone.`)) {
+        appDB.students = appDB.students.filter(s => s.id !== currentStudent.id);
+        saveDB(appDB);
+        showToast('Student deleted.', '🗑️');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 500);
+      }
+    });
+
+    // Attach PDF Modal
+    const addDocModal = document.getElementById('addDocModal');
+    document.getElementById('openAddDocModalBtn').addEventListener('click', () => {
+      document.getElementById('addDocForm').reset();
+      addDocModal.classList.add('open');
+    });
+    document.getElementById('closeAddDocModalBtn').addEventListener('click', () => addDocModal.classList.remove('open'));
+    document.getElementById('cancelAddDocBtn').addEventListener('click', () => addDocModal.classList.remove('open'));
+
+    document.getElementById('addDocForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const label = document.getElementById('docLabelInput').value.trim();
+      const file = document.getElementById('docFileInput').value.trim();
+
+      if (!label || !file) return;
+
+      if (!currentStudent.documents) currentStudent.documents = [];
+      currentStudent.documents.push({
+        label,
+        file,
+        sem: currentStudent.semester,
+        term: 'Term-End'
+      });
+
+      saveDB(appDB);
+      addDocModal.classList.remove('open');
+      renderDocs();
+      showToast(`Document "${label}" attached!`, '📄');
+    });
+
+    // Backup & Restore Dialog Trigger
+    document.getElementById('backupNavBtn').addEventListener('click', () => {
+      openBackupModal('export');
+    });
+
+    // Initial load
+    renderStudentPage();
+    initUniversalNav('student');
+  </script>
+
+  <!-- Universal Mobile Bottom Navigation Bar -->
+  <nav class="mobile-nav-bar" aria-label="Mobile Navigation">
+    <a href="index.html" id="mobNavHome" class="mobile-nav-btn">
+      <span style="font-size: 18px;">🏠</span>
+      <span>Students</span>
+    </a>
+    <a href="student.html" id="mobNavStudent" class="mobile-nav-btn active">
+      <span style="font-size: 18px;">👨‍🎓</span>
+      <span>Profile</span>
+    </a>
+    <a href="subject.html" id="mobNavSubject" class="mobile-nav-btn">
+      <span style="font-size: 18px;">📚</span>
+      <span>Subject</span>
+    </a>
+    <button id="mobNavBackup" class="mobile-nav-btn" onclick="openBackupModal('export')">
+      <span style="font-size: 18px;">💾</span>
+      <span>Backup</span>
+    </button>
+  </nav>
+</body>
+</html>

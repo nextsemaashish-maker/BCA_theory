@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduTrack — BCA Student Academic Tracker</title>
+  <meta name="description" content="Ultra-premium dark glassmorphism IGNOU BCA student progress and academic documents tracker." />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="app-header">
+    <div class="container header-content">
+      <!-- Left: Logo & Subtitle -->
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🎓</div>
+        <div>
+          <h1 class="brand-title">EduTrack</h1>
+          <p class="brand-sub">BCA Progress Tracker</p>
+        </div>
+      </a>
+
+      <!-- Universal Navigation Menu (Access all pages) -->
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="index.html" id="navHomeLink" class="nav-item-link active">
+          <span>🏠</span>
+          <span>Students</span>
+        </a>
+        <a href="student.html?id=1" id="navStudentLink" class="nav-item-link">
+          <span>👨‍🎓</span>
+          <span id="navStudentTitle">Student Profile</span>
+        </a>
+        <a href="subject.html?studentId=1&code=BCS-053" id="navSubjectLink" class="nav-item-link">
+          <span>📚</span>
+          <span id="navSubjectTitle">Subject Dossier</span>
+        </a>
+      </nav>
+
+      <!-- Quick Switcher Dropdown (Jump directly to student) -->
+      <div class="nav-switcher header-switcher">
+        <span style="font-size: 13px;" title="Quick Switch Student">👨‍🎓</span>
+        <select id="navStudentSwitcher" title="Jump directly to student profile">
+          <!-- Populated by initUniversalNav -->
+        </select>
+      </div>
+
+      <!-- Center: Frosted Glass Search Input -->
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input 
+          id="studentSearchInput" 
+          type="text" 
+          class="search-input" 
+          placeholder="Search student by name or enrollment (e.g. Aashish)..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Right: Actions -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="importQuickBtn" class="btn btn-outline" title="Import JSON Backup file">
+          <span>📥 Import JSON</span>
+        </button>
+        <button id="backupBtn" class="btn btn-outline" title="Export & Backup JSON Data">
+          <span>💾 Backup</span>
+        </button>
+        <button id="openAddStudentBtn" class="btn btn-primary">
+          <span>+ Add</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN WORKSPACE ================= -->
+  <main class="container" style="padding-top: 32px; padding-bottom: 64px;">
+
+    <!-- ================= SECTION 1: GLOBAL STATS ROW (4 GLOW CARDS) ================= -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 36px;">
+      
+      <!-- Total Students (Blue Glow) -->
+      <div class="card glow-card-blue" style="padding: 22px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Total Students</span>
+          <span style="font-size: 20px;">👨‍🎓</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <span id="statTotalStudents" style="font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">0</span>
+          <span style="font-size: 13px; color: var(--text-secondary);">Enrolled</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 11px; color: #60a5fa;">Active BCA Learner Cohort</div>
+      </div>
+
+      <!-- Subjects Complete Avg % (Green Glow) -->
+      <div class="card glow-card-green" style="padding: 22px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Subjects Complete</span>
+          <span style="font-size: 20px;">✅</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <span id="statSubjectAvg" style="font-size: 32px; font-weight: 800; color: #34d399; letter-spacing: -0.02em;">0%</span>
+          <span style="font-size: 13px; color: #34d399;">avg</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 11px; color: #34d399;">Cumulative Clearance Pace</div>
+      </div>
+
+      <!-- Theory Pending (Amber Glow) -->
+      <div class="card glow-card-amber" style="padding: 22px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Theory Pending</span>
+          <span style="font-size: 20px;">⚠️</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <span id="statTheoryPending" style="font-size: 32px; font-weight: 800; color: #fbbf24; letter-spacing: -0.02em;">0</span>
+          <span style="font-size: 13px; color: #fbbf24;">students</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 11px; color: #fbbf24;">Upcoming Term-End TEE Exams</div>
+      </div>
+
+      <!-- Assignment Pending (Red Glow) -->
+      <div class="card glow-card-red" style="padding: 22px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Assignment Pending</span>
+          <span style="font-size: 20px;">📝</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <span id="statAssignPending" style="font-size: 32px; font-weight: 800; color: #f87171; letter-spacing: -0.02em;">0</span>
+          <span style="font-size: 13px; color: #f87171;">students</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 11px; color: #f87171;">Tutor-Marked TMAs Requiring Clearance</div>
+      </div>
+
+    </div>
+
+    <!-- ================= SECTION 1.5: AGGREGATE PROGRESS TRENDS OVER SEMESTERS (SVG CHART) ================= -->
+    <section class="card" style="padding: 26px; margin-bottom: 36px; background: linear-gradient(145deg, rgba(17,24,39,0.92), rgba(13,21,38,0.85));">
+      
+      <!-- Chart Top Header & Controls -->
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+            <span style="font-size: 20px;">📈</span>
+            <h2 style="font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.01em;">
+              Aggregate Cohort Progress Trends Across Semesters
+            </h2>
+            <span class="badge badge-complete" id="chartCohortBadge">BCA 6 Semesters</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); max-width: 680px; line-height: 1.5;">
+            Dynamic progression visualization showing cumulative course clearance, theory exam completion (TEE), and assignment submissions (TMA) across all enrolled learners from Semester 1 through 6.
+          </p>
+        </div>
+
+        <!-- Metric Filters & Chart Type Switches -->
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 6px; background: rgba(10,15,30,0.65); padding: 4px 6px; border-radius: var(--radius-pill); border: 1px solid var(--border);">
+            <button id="toggleMetricOverall" class="chart-legend-btn active" style="color: #34d399;" title="Toggle Overall Clearance">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 6px #10b981;"></span>
+              <span>Overall Cleared</span>
+            </button>
+            <button id="toggleMetricTheory" class="chart-legend-btn active" style="color: #fbbf24;" title="Toggle Theory Exams">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 6px #f59e0b;"></span>
+              <span>Theory (TEE)</span>
+            </button>
+            <button id="toggleMetricAssign" class="chart-legend-btn active" style="color: #60a5fa;" title="Toggle Assignments">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #60a5fa; box-shadow: 0 0 6px #3b82f6;"></span>
+              <span>Assignment (TMA)</span>
+            </button>
+          </div>
+
+          <!-- View Mode Toggle -->
+          <div style="display: flex; background: rgba(10,15,30,0.65); padding: 4px; border-radius: var(--radius-pill); border: 1px solid var(--border);">
+            <button id="chartViewSpline" class="tab-btn active" style="padding: 4px 10px; font-size: 11px;">
+              <span>📈 Spline Area</span>
+            </button>
+            <button id="chartViewBar" class="tab-btn" style="padding: 4px 10px; font-size: 11px;">
+              <span>📊 Comparison Bars</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SVG Chart Wrapper -->
+      <div class="chart-container" id="chartContainer" style="min-height: 250px;">
+        <div id="chartSvgWrapper" style="width: 100%; height: 250px;"></div>
+        <!-- Floating Interactive Tooltip -->
+        <div id="chartTooltip" class="chart-tooltip"></div>
+      </div>
+
+      <!-- Semester Summary Stat Pills (Sem 1 to Sem 6) -->
+      <div id="semesterStatPills" style="display: flex; gap: 10px; margin-top: 18px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+        <!-- Dynamically injected by JS -->
+      </div>
+    </section>
+
+    <!-- ================= SECTION 2: STUDENT ROSTER HEADER & CONTROLS ================= -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.01em;">Active Enrolled Learners</h2>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
+          Click any card to open the complete student dashboard in a new tab.
+        </p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span id="resultsCountBadge" class="badge badge-info font-mono">2 Records</span>
+        <button id="restoreDefaultsBtn" class="btn btn-outline btn-sm" title="Reset sample demo data if needed">
+          <span>↺ Reset Demo</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= SECTION 3: STUDENT GRID ================= -->
+    <div id="studentsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 22px;">
+      <!-- Injected by JavaScript -->
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptySearchNotice" class="card" style="display: none; padding: 48px 24px; text-align: center; margin-top: 24px;">
+      <div style="font-size: 36px; margin-bottom: 12px;">🔍</div>
+      <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">No Students Matching Search</h3>
+      <p style="font-size: 13px; color: var(--text-secondary); max-width: 360px; margin: 0 auto 18px;">
+        No learner matches the query. Check spelling or clear search filter.
+      </p>
+      <button onclick="document.getElementById('studentSearchInput').value=''; filterStudents('');" class="btn btn-outline btn-sm">
+        <span>Clear Search</span>
+      </button>
+    </div>
+
+    <!-- IGNOU BCA Degree Criteria Guide -->
+    <div class="card" style="margin-top: 36px; padding: 22px; background: rgba(13,21,38,0.7); border-color: rgba(59,130,246,0.3);">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; font-size: 20px;">
+            🏛️
+          </div>
+          <div>
+            <h4 style="font-size: 15px; font-weight: 700; color: #ffffff;">IGNOU BCA Degree Clearance Criteria</h4>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+              Minimum 40% aggregate required in both <b style="color: #34d399;">Theory (TEE)</b> and <b style="color: #60a5fa;">Assignments (TMA)</b> independently for a course to be marked complete.
+            </p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge badge-complete">Theory 70% Weightage</span>
+          <span class="badge badge-info">Assignment 30% Weightage</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= ADD STUDENT MODAL ================= -->
+  <div id="addStudentModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+            🎓
+          </div>
+          <div>
+            <h3 style="font-size: 17px; font-weight: 800; color: #fff;">Enroll New BCA Student</h3>
+            <p style="font-size: 11px; color: var(--text-secondary);">Enter academic profile details</p>
+          </div>
+        </div>
+        <button id="closeAddModalBtn" style="background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 4px;">✕</button>
+      </div>
+
+      <form id="addStudentForm">
+        <div class="form-group">
+          <label class="form-label" for="addName">Full Name *</label>
+          <input id="addName" type="text" class="form-input" placeholder="e.g. Ramesh Patel" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="addEnrollment">Enrollment Number *</label>
+          <input id="addEnrollment" type="text" class="form-input" placeholder="e.g. BCA2023019" required font-family="JetBrains Mono" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="addSemester">Current Semester *</label>
+            <select id="addSemester" class="form-select" required>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5" selected>Semester 5</option>
+              <option value="6">Semester 6</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="addContact">Contact Phone / Email</label>
+            <input id="addContact" type="text" class="form-input" placeholder="+91 98765 43210" />
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+          <button type="button" id="cancelAddBtn" class="btn btn-outline">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Save &amp; Track Student
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared App JS -->
+  <script src="./app.js"></script>
+
+  <!-- Page 1 Interactive Script -->
+  <script>
+    let appDB = loadDB();
+
+    function renderPage() {
+      updateStats();
+      renderTrendChart();
+      renderGrid();
+    }
+
+    function updateStats() {
+      const students = appDB.students || [];
+      document.getElementById('statTotalStudents').textContent = students.length;
+      document.getElementById('resultsCountBadge').textContent = `${students.length} Records`;
+
+      if (students.length === 0) {
+        document.getElementById('statSubjectAvg').textContent = '0%';
+        document.getElementById('statTheoryPending').textContent = '0';
+        document.getElementById('statAssignPending').textContent = '0';
+        return;
+      }
+
+      let totalPctSum = 0;
+      let theoryPendingStudents = 0;
+      let assignPendingStudents = 0;
+
+      students.forEach(s => {
+        const stats = getStats(s);
+        totalPctSum += stats.pct;
+        if (stats.theoryPending > 0) theoryPendingStudents++;
+        if (stats.assignPending > 0) assignPendingStudents++;
+      });
+
+      const avg = Math.round(totalPctSum / students.length);
+      document.getElementById('statSubjectAvg').textContent = `${avg}%`;
+      document.getElementById('statTheoryPending').textContent = theoryPendingStudents;
+      document.getElementById('statAssignPending').textContent = assignPendingStudents;
+    }
+
+    function renderGrid(filterQuery = '') {
+      const grid = document.getElementById('studentsGrid');
+      const emptyNotice = document.getElementById('emptySearchNotice');
+      grid.innerHTML = '';
+
+      const q = (filterQuery || document.getElementById('studentSearchInput').value || '').trim().toLowerCase();
+      const filtered = appDB.students.filter(s => {
+        return s.name.toLowerCase().includes(q) || s.enrollment.toLowerCase().includes(q);
+      });
+
+      if (filtered.length === 0) {
+        emptyNotice.style.display = 'block';
+        return;
+      }
+      emptyNotice.style.display = 'none';
+
+      filtered.forEach((student, index) => {
+        const stats = getStats(student);
+        const initials = getInitials(student.name);
+        const avatarColor = getColor(student.colorIdx !== undefined ? student.colorIdx : index);
+        const docCount = student.documents ? student.documents.length : 0;
+
+        const card = document.createElement('div');
+        card.className = 'card student-card animate-fade-in';
+        card.style.setProperty('--card-accent', avatarColor);
+        card.style.padding = '22px';
+
+        card.innerHTML = `
+          <!-- Header with Avatar, Name, Enrollment, Sem Badge -->
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: ${avatarColor}; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #fff; box-shadow: 0 0 16px ${avatarColor}55; flex-shrink: 0;">
+                ${initials}
+              </div>
+              <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                  ${student.name}
+                </h3>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 3px;">
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary);">${student.enrollment}</span>
+                </div>
+              </div>
+            </div>
+
+            <span class="badge badge-info" style="font-size: 11px;">
+              Sem ${student.semester}
+            </span>
+          </div>
+
+          <!-- Progress Bar & Clearance Status -->
+          <div style="margin-bottom: 18px; background: rgba(10,15,30,0.6); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 6px;">
+              <span style="color: var(--text-secondary); font-weight: 500;">Coursework Clearance</span>
+              <span style="font-weight: 700; color: ${stats.pct === 100 ? '#34d399' : '#60a5fa'}; font-family: 'JetBrains Mono';">
+                ${stats.fullyComplete}/${stats.total} (${stats.pct}%)
+              </span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width: ${stats.pct}%;"></div>
+            </div>
+          </div>
+
+          <!-- Status Indicator Pills Cluster -->
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;">
+            ${stats.theoryPending > 0 
+              ? `<span class="badge badge-warning">⚠️ Theory: ${stats.theoryPending} Pending</span>`
+              : `<span class="badge badge-complete">✅ Theory Complete</span>`
+            }
+            ${stats.assignPending > 0 
+              ? `<span class="badge badge-error">❌ Assignment: ${stats.assignPending} Pending</span>`
+              : `<span class="badge badge-complete">✅ Assignment Complete</span>`
+            }
+            <span class="badge badge-info" style="margin-left: auto;">
+              📄 ${docCount} Linked PDF${docCount === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          <!-- Card Footer Action -->
+          <div style="padding-top: 14px; border-top: 1px solid rgba(30,45,74,0.6); display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 11px; color: var(--text-muted);">Click to open student dashboard</span>
+            <span style="font-size: 12px; font-weight: 600; color: var(--accent-blue); display: flex; align-items: center; gap: 4px;">
+              <span>View Profile</span>
+              <span>&rarr;</span>
+            </span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          window.open(`student.html?id=${student.id}`, '_blank');
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    function filterStudents(query) {
+      renderGrid(query);
+    }
+
+    document.getElementById('studentSearchInput').addEventListener('input', (e) => {
+      filterStudents(e.target.value);
+    });
+
+    const modal = document.getElementById('addStudentModal');
+    document.getElementById('openAddStudentBtn').addEventListener('click', () => {
+      modal.classList.add('open');
+      document.getElementById('addName').focus();
+    });
+    document.getElementById('closeAddModalBtn').addEventListener('click', () => {
+      modal.classList.remove('open');
+    });
+    document.getElementById('cancelAddBtn').addEventListener('click', () => {
+      modal.classList.remove('open');
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+
+    document.getElementById('addStudentForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('addName').value.trim();
+      const enrollment = document.getElementById('addEnrollment').value.trim();
+      const semester = parseInt(document.getElementById('addSemester').value, 10);
+      const contact = document.getElementById('addContact').value.trim();
+
+      if (!name || !enrollment) return;
+
+      const subList = getSubjects(semester);
+      const subjectsMap = {};
+      subList.forEach(s => {
+        subjectsMap[s.code] = { theory: 'pending', assignment: 'pending' };
+      });
+
+      const newStudent = {
+        id: Date.now(),
+        name,
+        enrollment,
+        semester,
+        contact,
+        email: `${name.toLowerCase().replace(/\s+/g, '.')}@ignou.ac.in`,
+        center: 'Study Center 0711',
+        colorIdx: appDB.students.length % AVATAR_COLORS.length,
+        documents: [],
+        subjects: subjectsMap
+      };
+
+      appDB.students.push(newStudent);
+      saveDB(appDB);
+
+      modal.classList.remove('open');
+      document.getElementById('addStudentForm').reset();
+      renderPage();
+      showToast(`Student ${name} successfully enrolled!`, '🎓');
+    });
+
+    // Backup & Restore Dialog
+    document.getElementById('backupBtn').addEventListener('click', () => {
+      openBackupModal('export');
+    });
+
+    document.getElementById('importQuickBtn').addEventListener('click', () => {
+      openBackupModal('import');
+    });
+
+    // ── PROGRESS TRENDS SVG CHART IMPLEMENTATION ─────────────
+    let chartViewMode = 'spline'; // 'spline' or 'bar'
+    const chartMetrics = {
+      overall: true,
+      theory: true,
+      assign: true
+    };
+    let selectedSemIndex = null;
+
+    function renderTrendChart() {
+      const container = document.getElementById('chartSvgWrapper');
+      const pillsContainer = document.getElementById('semesterStatPills');
+      const tooltip = document.getElementById('chartTooltip');
+      if (!container) return;
+
+      const semesters = [1, 2, 3, 4, 5, 6];
+      const students = appDB.students || [];
+
+      // 1. Calculate aggregate stats across all semesters
+      const semData = semesters.map(sem => {
+        const subjects = BCA_SUBJECTS[sem] || [];
+        const credits = subjects.reduce((sum, s) => sum + s.credits, 0);
+
+        if (students.length === 0 || subjects.length === 0) {
+          return {
+            sem,
+            credits,
+            subjectCount: subjects.length,
+            overallPct: 0,
+            theoryPct: 0,
+            assignPct: 0,
+            clearedCount: 0,
+            theoryCount: 0,
+            assignCount: 0,
+            totalEvaluations: 0,
+            activeLearners: 0
+          };
+        }
+
+        let totalEvaluations = students.length * subjects.length;
+        let clearedCount = 0;
+        let theoryCount = 0;
+        let assignCount = 0;
+
+        students.forEach(st => {
+          subjects.forEach(sub => {
+            const rec = st.subjects ? st.subjects[sub.code] : null;
+            if (rec) {
+              if (rec.theory === 'complete' && rec.assignment === 'complete') {
+                clearedCount++;
+              }
+              if (rec.theory === 'complete') {
+                theoryCount++;
+              }
+              if (rec.assignment === 'complete') {
+                assignCount++;
+              }
+            }
+          });
+        });
+
+        const activeLearners = students.filter(s => s.semester >= sem).length;
+
+        return {
+          sem,
+          credits,
+          subjectCount: subjects.length,
+          overallPct: Math.round((clearedCount / totalEvaluations) * 100),
+          theoryPct: Math.round((theoryCount / totalEvaluations) * 100),
+          assignPct: Math.round((assignCount / totalEvaluations) * 100),
+          clearedCount,
+          theoryCount,
+          assignCount,
+          totalEvaluations,
+          activeLearners
+        };
+      });
+
+      // 2. Render Semester Pills at the bottom
+      if (pillsContainer) {
+        pillsContainer.innerHTML = '';
+        semData.forEach((d, idx) => {
+          const pill = document.createElement('div');
+          pill.className = `sem-stat-pill ${selectedSemIndex === idx ? 'active' : ''}`;
+          pill.innerHTML = `
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">
+              Sem ${d.sem}
+            </div>
+            <div style="font-size: 16px; font-weight: 800; color: ${d.overallPct === 100 ? '#34d399' : (d.overallPct > 0 ? '#60a5fa' : '#94a3b8')}; font-family: 'JetBrains Mono';">
+              ${d.overallPct}%
+            </div>
+            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+              ${d.subjectCount} Sub • ${d.credits} Cr
+            </div>
+          `;
+          pill.addEventListener('click', () => {
+            selectedSemIndex = selectedSemIndex === idx ? null : idx;
+            renderTrendChart();
+            if (selectedSemIndex !== null) {
+              showTooltipForSem(idx, semData[idx], container, tooltip);
+            } else {
+              hideTooltip(tooltip);
+            }
+          });
+          pillsContainer.appendChild(pill);
+        });
+      }
+
+      // 3. Setup SVG Canvas coordinates
+      const W = 800;
+      const H = 240;
+      const padL = 50;
+      const padR = 40;
+      const padT = 20;
+      const padB = 40;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const getX = (i) => padL + (i / (semData.length - 1)) * plotW;
+      const getY = (pct) => (padT + plotH) - (pct / 100) * plotH;
+
+      // Background percentage gridlines
+      const gridPcts = [100, 75, 50, 25, 0];
+      let gridHtml = '';
+      gridPcts.forEach(p => {
+        const y = getY(p);
+        gridHtml += `
+          <g>
+            <line x1="${padL - 6}" y1="${y}" x2="${W - padR + 6}" y2="${y}" stroke="rgba(30, 45, 74, 0.55)" stroke-dasharray="3,3" stroke-width="1" />
+            <text x="${padL - 12}" y="${y + 4}" fill="#64748b" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="end">${p}%</text>
+          </g>
+        `;
+      });
+
+      // X-Axis Semester labels
+      let xLabelsHtml = '';
+      semData.forEach((d, i) => {
+        const x = getX(i);
+        const isSelected = selectedSemIndex === i;
+        xLabelsHtml += `
+          <g>
+            <line x1="${x}" y1="${padT}" x2="${x}" y2="${padT + plotH}" stroke="${isSelected ? 'rgba(59, 130, 246, 0.5)' : 'rgba(30, 45, 74, 0.35)'}" stroke-width="${isSelected ? 2 : 1}" />
+            <text x="${x}" y="${H - 14}" fill="${isSelected ? '#60a5fa' : '#94a3b8'}" font-size="11" font-weight="${isSelected ? '700' : '600'}" text-anchor="middle">
+              Sem ${d.sem}
+            </text>
+            <text x="${x}" y="${H - 1}" fill="#64748b" font-size="9" text-anchor="middle">
+              ${d.credits} Cr
+            </text>
+          </g>
+        `;
+      });
+
+      let chartContentHtml = '';
+
+      if (chartViewMode === 'spline') {
+        // ── SPLINE CURVE VIEW ──
+        function createSmoothPath(points) {
+          if (points.length < 2) return '';
+          let d = `M ${points[0].x} ${points[0].y}`;
+          for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i === 0 ? i : i - 1];
+            const p1 = points[i];
+            const p2 = points[i + 1];
+            const p3 = points[i + 2] ? points[i + 2] : p2;
+
+            const cp1x = p1.x + (p2.x - p0.x) / 6;
+            const cp1y = p1.y + (p2.y - p0.y) / 6;
+            const cp2x = p2.x - (p3.x - p1.x) / 6;
+            const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+            d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+          }
+          return d;
+        }
+
+        const overallPoints = semData.map((d, i) => ({ x: getX(i), y: getY(d.overallPct) }));
+        const theoryPoints = semData.map((d, i) => ({ x: getX(i), y: getY(d.theoryPct) }));
+        const assignPoints = semData.map((d, i) => ({ x: getX(i), y: getY(d.assignPct) }));
+
+        const overallPath = createSmoothPath(overallPoints);
+        const theoryPath = createSmoothPath(theoryPoints);
+        const assignPath = createSmoothPath(assignPoints);
+
+        const areaPath = `${overallPath} L ${overallPoints[overallPoints.length - 1].x} ${getY(0)} L ${overallPoints[0].x} ${getY(0)} Z`;
+
+        let pathsHtml = '';
+        if (chartMetrics.overall) {
+          pathsHtml += `<path d="${areaPath}" fill="url(#overallAreaGrad)" opacity="0.85" />`;
+        }
+        if (chartMetrics.assign) {
+          pathsHtml += `<path d="${assignPath}" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-dasharray="4,4" filter="url(#glowBlue)" opacity="0.95" />`;
+        }
+        if (chartMetrics.theory) {
+          pathsHtml += `<path d="${theoryPath}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="5,3" filter="url(#glowAmber)" opacity="0.95" />`;
+        }
+        if (chartMetrics.overall) {
+          pathsHtml += `<path d="${overallPath}" fill="none" stroke="#34d399" stroke-width="3.5" filter="url(#glowGreen)" />`;
+        }
+
+        // Data nodes and hover columns
+        let dotsHtml = '';
+        semData.forEach((d, i) => {
+          const x = getX(i);
+          const isSelected = selectedSemIndex === i;
+
+          if (chartMetrics.assign) {
+            const yA = getY(d.assignPct);
+            dotsHtml += `<circle cx="${x}" cy="${yA}" r="${isSelected ? 6 : 4}" fill="#60a5fa" stroke="#0a0f1e" stroke-width="2" class="chart-dot" data-sem="${i}" />`;
+          }
+          if (chartMetrics.theory) {
+            const yT = getY(d.theoryPct);
+            dotsHtml += `<circle cx="${x}" cy="${yT}" r="${isSelected ? 6 : 4}" fill="#fbbf24" stroke="#0a0f1e" stroke-width="2" class="chart-dot" data-sem="${i}" />`;
+          }
+          if (chartMetrics.overall) {
+            const yO = getY(d.overallPct);
+            dotsHtml += `<circle cx="${x}" cy="${yO}" r="${isSelected ? 7 : 5}" fill="#34d399" stroke="#0a0f1e" stroke-width="2" class="chart-dot" data-sem="${i}" />`;
+          }
+
+          dotsHtml += `<rect x="${x - 35}" y="${padT}" width="70" height="${plotH}" fill="transparent" style="cursor: pointer;" data-sem="${i}" class="chart-col-hover" />`;
+        });
+
+        chartContentHtml = pathsHtml + dotsHtml;
+
+      } else {
+        // ── COMPARISON BAR VIEW ──
+        let barsHtml = '';
+        const groupWidth = 44;
+        const barWidth = 11;
+        const barGap = 3;
+
+        semData.forEach((d, i) => {
+          const centerX = getX(i);
+          const startX = centerX - (groupWidth / 2);
+          const isSelected = selectedSemIndex === i;
+
+          if (isSelected) {
+            barsHtml += `<rect x="${centerX - 35}" y="${padT}" width="70" height="${plotH}" fill="rgba(59, 130, 246, 0.09)" rx="6" />`;
+          }
+
+          let currX = startX;
+          if (chartMetrics.overall) {
+            const hO = Math.max(3, (d.overallPct / 100) * plotH);
+            const yO = (padT + plotH) - hO;
+            barsHtml += `<rect x="${currX}" y="${yO}" width="${barWidth}" height="${hO}" rx="3" fill="#34d399" filter="url(#glowGreen)" class="chart-bar" data-sem="${i}" />`;
+            currX += barWidth + barGap;
+          }
+          if (chartMetrics.theory) {
+            const hT = Math.max(3, (d.theoryPct / 100) * plotH);
+            const yT = (padT + plotH) - hT;
+            barsHtml += `<rect x="${currX}" y="${yT}" width="${barWidth}" height="${hT}" rx="3" fill="#fbbf24" filter="url(#glowAmber)" class="chart-bar" data-sem="${i}" />`;
+            currX += barWidth + barGap;
+          }
+          if (chartMetrics.assign) {
+            const hA = Math.max(3, (d.assignPct / 100) * plotH);
+            const yA = (padT + plotH) - hA;
+            barsHtml += `<rect x="${currX}" y="${yA}" width="${barWidth}" height="${hA}" rx="3" fill="#60a5fa" filter="url(#glowBlue)" class="chart-bar" data-sem="${i}" />`;
+          }
+
+          barsHtml += `<rect x="${centerX - 35}" y="${padT}" width="70" height="${plotH}" fill="transparent" style="cursor: pointer;" data-sem="${i}" class="chart-col-hover" />`;
+        });
+
+        chartContentHtml = barsHtml;
+      }
+
+      // Assemble SVG string
+      container.innerHTML = `
+        <svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="overflow: visible;" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="overallAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.30" />
+              <stop offset="70%" stop-color="#10b981" stop-opacity="0.06" />
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0.0" />
+            </linearGradient>
+            <filter id="glowGreen" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#10b981" flood-opacity="0.6" />
+            </filter>
+            <filter id="glowAmber" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#f59e0b" flood-opacity="0.6" />
+            </filter>
+            <filter id="glowBlue" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#3b82f6" flood-opacity="0.6" />
+            </filter>
+          </defs>
+          ${gridHtml}
+          ${xLabelsHtml}
+          ${chartContentHtml}
+        </svg>
+      `;
+
+      // Wire Hover & Click Handlers
+      container.querySelectorAll('.chart-col-hover, .chart-dot, .chart-bar').forEach(el => {
+        el.addEventListener('mouseenter', (e) => {
+          const semIdx = parseInt(e.currentTarget.getAttribute('data-sem'), 10);
+          if (!isNaN(semIdx) && semData[semIdx]) {
+            showTooltipForSem(semIdx, semData[semIdx], container, tooltip);
+          }
+        });
+
+        el.addEventListener('mouseleave', () => {
+          if (selectedSemIndex === null) {
+            hideTooltip(tooltip);
+          }
+        });
+
+        el.addEventListener('click', (e) => {
+          const semIdx = parseInt(e.currentTarget.getAttribute('data-sem'), 10);
+          if (!isNaN(semIdx)) {
+            selectedSemIndex = selectedSemIndex === semIdx ? null : semIdx;
+            renderTrendChart();
+            if (selectedSemIndex !== null) {
+              showTooltipForSem(semIdx, semData[semIdx], container, tooltip);
+            } else {
+              hideTooltip(tooltip);
+            }
+          }
+        });
+      });
+    }
+
+    function showTooltipForSem(semIdx, d, container, tooltip) {
+      if (!tooltip || !container) return;
+      const rect = container.getBoundingClientRect();
+      const W = 800;
+      const padL = 50;
+      const padR = 40;
+      const plotW = W - padL - padR;
+      const pctX = (padL + (semIdx / 5) * plotW) / W;
+
+      const leftPx = pctX * rect.width;
+      const topPx = 70;
+
+      tooltip.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border);">
+          <span style="font-weight: 800; color: #fff; font-size: 13px;">Semester ${d.sem} Trend</span>
+          <span class="badge badge-info" style="font-size: 10px;">${d.credits} Credits • ${d.subjectCount} Modules</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+          <div style="display: flex; justify-content: space-between; gap: 16px;">
+            <span style="color: #94a3b8;">Overall Cleared:</span>
+            <b style="color: #34d399;">${d.overallPct}% (${d.clearedCount}/${d.totalEvaluations})</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;">
+            <span style="color: #94a3b8;">Theory (TEE):</span>
+            <b style="color: #fbbf24;">${d.theoryPct}% (${d.theoryCount}/${d.totalEvaluations})</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;">
+            <span style="color: #94a3b8;">Assignment (TMA):</span>
+            <b style="color: #60a5fa;">${d.assignPct}% (${d.assignCount}/${d.totalEvaluations})</b>
+          </div>
+          <div style="display: flex; justify-content: space-between; gap: 16px; margin-top: 4px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.1); font-size: 10px; font-family: inherit;">
+            <span style="color: var(--text-muted);">Active Enrolled Cohort:</span>
+            <span style="color: #fff; font-weight: 600;">${d.activeLearners} Student${d.activeLearners === 1 ? '' : 's'}</span>
+          </div>
+        </div>
+      `;
+
+      tooltip.style.left = `${leftPx}px`;
+      tooltip.style.top = `${topPx}px`;
+      tooltip.classList.add('active');
+    }
+
+    function hideTooltip(tooltip) {
+      if (tooltip) tooltip.classList.remove('active');
+    }
+
+    // Chart metric and view mode controls
+    document.getElementById('toggleMetricOverall').addEventListener('click', (e) => {
+      chartMetrics.overall = !chartMetrics.overall;
+      e.currentTarget.classList.toggle('active', chartMetrics.overall);
+      renderTrendChart();
+    });
+
+    document.getElementById('toggleMetricTheory').addEventListener('click', (e) => {
+      chartMetrics.theory = !chartMetrics.theory;
+      e.currentTarget.classList.toggle('active', chartMetrics.theory);
+      renderTrendChart();
+    });
+
+    document.getElementById('toggleMetricAssign').addEventListener('click', (e) => {
+      chartMetrics.assign = !chartMetrics.assign;
+      e.currentTarget.classList.toggle('active', chartMetrics.assign);
+      renderTrendChart();
+    });
+
+    document.getElementById('chartViewSpline').addEventListener('click', () => {
+      chartViewMode = 'spline';
+      document.getElementById('chartViewSpline').classList.add('active');
+      document.getElementById('chartViewBar').classList.remove('active');
+      renderTrendChart();
+    });
+
+    document.getElementById('chartViewBar').addEventListener('click', () => {
+      chartViewMode = 'bar';
+      document.getElementById('chartViewBar').classList.add('active');
+      document.getElementById('chartViewSpline').classList.remove('active');
+      renderTrendChart();
+    });
+
+    // Reset Demo
+    document.getElementById('restoreDefaultsBtn').addEventListener('click', () => {
+      if (confirm('Reset to default initial student demo dataset?')) {
+        appDB = { students: getDefaultStudents() };
+        saveDB(appDB);
+        renderPage();
+        showToast('Demo data restored successfully!', '↺');
+      }
+    });
+
+    renderPage();
+    initUniversalNav('home');
+  </script>
+
+  <!-- Universal Mobile Bottom Navigation Bar -->
+  <nav class="mobile-nav-bar" aria-label="Mobile Navigation">
+    <a href="index.html" id="mobNavHome" class="mobile-nav-btn active">
+      <span style="font-size: 18px;">🏠</span>
+      <span>Students</span>
+    </a>
+    <a href="student.html?id=1" id="mobNavStudent" class="mobile-nav-btn">
+      <span style="font-size: 18px;">👨‍🎓</span>
+      <span>Profile</span>
+    </a>
+    <a href="subject.html?studentId=1&code=BCS-053" id="mobNavSubject" class="mobile-nav-btn">
+      <span style="font-size: 18px;">📚</span>
+      <span>Subject</span>
+    </a>
+    <button id="mobNavBackup" class="mobile-nav-btn" onclick="openBackupModal('export')">
+      <span style="font-size: 18px;">💾</span>
+      <span>Backup</span>
+    </button>
+  </nav>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subject Detail — EduTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<header class="site-header"></header>
+
+<!-- BREADCRUMB BAR -->
+<div class="breadcrumb-bar" id="subjectBreadcrumb">
+  <a href="index.html">🏠 Home</a>
+  <span class="crumb-sep">/</span>
+  <a id="breadStudentLink" href="#">👨‍🎓 <span id="breadStudentName">Student</span></a>
+  <span class="crumb-sep">/</span>
+  <span class="crumb-current">📘 <span id="breadSubjectCode">Subject</span></span>
+</div>
+
+
+<!-- MAIN -->
+<main class="page-body">
+
+  <!-- BACK LINK -->
+  <a class="back-link" id="backLink" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    <span id="backText">Student par wapas jao</span>
+  </a>
+
+  <!-- SUBJECT HERO -->
+  <div class="subject-hero" id="subjectHero"></div>
+
+  <!-- STATUS TOGGLES -->
+  <div class="status-section" id="statusSection">
+    <div style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text)">📊 Status Update Karein</div>
+    <div id="statusToggles"></div>
+  </div>
+
+  <!-- DOCUMENTS SECTION -->
+  <div class="section-divider">📄 Related Documents &amp; Results</div>
+  <div id="docsGrid"></div>
+
+</main>
+
+<div class="toast" id="globalToast"></div>
+
+<script src="app.js"></script>
+<script>
+  // ── INIT ────────────────────────────────────────
+  const params = new URLSearchParams(location.search);
+  const studentId  = parseInt(params.get('student'));
+  const subjectCode = params.get('subject') || '';
+
+  let DB = loadDB();
+  let student = DB.students.find(s => s.id === studentId);
+  let subjectMeta = null;
+
+  if (!student) {
+    document.body.innerHTML = `<div style="text-align:center;padding:80px;color:#94a3b8">
+      <div style="font-size:60px;margin-bottom:16px">😕</div>
+      <h2>Student nahi mila</h2>
+      <a href="index.html" style="color:#60a5fa;text-decoration:none">← Home</a>
+    </div>`;
+  } else {
+    // Find subject metadata
+    const semSubjects = getSubjectList(student.semester);
+    subjectMeta = semSubjects.find(s => s.code === subjectCode);
+    if (!subjectMeta) {
+      subjectMeta = { code: subjectCode, name: 'Unknown Subject', credits: 0 };
+    }
+    init();
+  }
+
+  function init() {
+    document.title = subjectCode + ' — ' + student.name + ' — EduTrack';
+    renderGlobalNavbar('subject', { studentId: student.id, subjectCode: subjectCode });
+
+    // Back link & Breadcrumbs
+    document.getElementById('backLink').href = 'student.html?id=' + student.id;
+    document.getElementById('backText').textContent = student.name + ' par wapas jao';
+    const bLink = document.getElementById('breadStudentLink');
+    if (bLink) {
+      bLink.href = 'student.html?id=' + student.id;
+      document.getElementById('breadStudentName').textContent = student.name;
+    }
+    const bSub = document.getElementById('breadSubjectCode');
+    if (bSub) {
+      bSub.textContent = subjectCode + ' (' + subjectMeta.name + ')';
+    }
+
+    renderHero();
+    renderToggles();
+    renderDocs();
+  }
+
+  // ── SUBJECT HERO ────────────────────────────────
+  function renderHero() {
+    const color = getColor(student.colorIdx);
+    document.getElementById('subjectHero').innerHTML = `
+      <div>
+        <div class="subject-code-big">${subjectMeta.code}</div>
+        <h1 class="subject-name-big">${subjectMeta.name}</h1>
+        <div class="subject-meta-row">
+          <span>💎 ${subjectMeta.credits} Credits</span>
+          <span>•</span>
+          <span>📅 Semester ${student.semester}</span>
+          <span>•</span>
+          <span style="display:inline-flex;align-items:center;gap:7px">
+            <span style="width:24px;height:24px;border-radius:50%;background:${color};display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white">${getInitials(student.name)}</span>
+            ${student.name}
+          </span>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── STATUS TOGGLES ──────────────────────────────
+  function renderToggles() {
+    const status = student.subjects[subjectCode] || { theory:'pending', assignment:'pending' };
+    const tDone = status.theory === 'complete';
+    const aDone = status.assignment === 'complete';
+
+    document.getElementById('statusToggles').innerHTML = `
+      <div class="status-row">
+        <div class="status-field-name">📖 Theory Status</div>
+        <div class="status-btns">
+          <button class="status-toggle ${tDone ? 'active-green' : ''}" onclick="setStatus('theory','complete')">✅ Complete</button>
+          <button class="status-toggle ${!tDone ? 'active-amber' : ''}" onclick="setStatus('theory','pending')">⏳ Pending</button>
+        </div>
+      </div>
+      <div class="status-row">
+        <div class="status-field-name">📝 Assignment Status</div>
+        <div class="status-btns">
+          <button class="status-toggle ${aDone ? 'active-green' : ''}" onclick="setStatus('assignment','complete')">✅ Complete</button>
+          <button class="status-toggle ${!aDone ? 'active-red' : ''}" onclick="setStatus('assignment','pending')">❌ Pending</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function setStatus(field, value) {
+    if (!student.subjects[subjectCode]) {
+      student.subjects[subjectCode] = { theory:'pending', assignment:'pending' };
+    }
+    student.subjects[subjectCode][field] = value;
+    const idx = DB.students.findIndex(s => s.id === student.id);
+    if (idx !== -1) DB.students[idx] = student;
+    saveDB(DB);
+    renderToggles();
+    showToast(`✅ ${subjectCode} ${field} — ${value}!`);
+  }
+
+  // ── DOCUMENTS ───────────────────────────────────
+  function renderDocs() {
+    const container = document.getElementById('docsGrid');
+    if (!student.documents || student.documents.length === 0) {
+      container.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <p>Is student ke liye koi document upload nahi kiya gaya.</p>
+        <a href="student.html?id=${student.id}" class="btn btn-secondary btn-sm">← Student Page par jao</a>
+      </div>`;
+      return;
+    }
+    container.innerHTML = `<div class="docs-grid">` +
+      student.documents.map(doc => `
+        <div class="pdf-card">
+          <div class="pdf-icon">📋</div>
+          <div class="pdf-label">${doc.label}</div>
+          <div class="pdf-sub">PDF Document</div>
+          <button class="btn btn-primary btn-sm" onclick="openPDF('${doc.file.replace(/'/g,"\\'")}')">📂 Open PDF</button>
+        </div>
+      `).join('') +
+    `</div>`;
+  }
+
+  function openPDF(path) {
+    window.open(path, '_blank');
+  }
+</script>
+</body>
+</html>

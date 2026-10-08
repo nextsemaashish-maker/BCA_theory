@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Detail — EduTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<header class="site-header"></header>
+
+<!-- BREADCRUMB BAR -->
+<div class="breadcrumb-bar" id="studentBreadcrumb">
+  <a href="index.html">🏠 Home</a>
+  <span class="crumb-sep">/</span>
+  <span class="crumb-current">👨‍🎓 <span id="breadStudentName">Student Profile</span></span>
+</div>
+
+
+<!-- MAIN -->
+<main class="page-body">
+
+  <!-- BACK -->
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    Home par wapas jao
+  </a>
+
+  <!-- HERO -->
+  <div class="student-hero" id="heroSection"></div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-subjects" onclick="switchTab('subjects')">📚 Subjects</button>
+    <button class="tab-btn" id="tab-docs" onclick="switchTab('docs')">📄 Documents & Results</button>
+  </div>
+
+  <!-- TAB: SUBJECTS -->
+  <div class="tab-pane active" id="pane-subjects">
+    <div class="subjects-list" id="subjectsList"></div>
+  </div>
+
+  <!-- TAB: DOCUMENTS -->
+  <div class="tab-pane" id="pane-docs">
+    <div id="docsSection"></div>
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div style="display:flex;gap:12px;margin-top:32px;flex-wrap:wrap">
+    <button class="btn btn-secondary" onclick="openEditModal()">✏️ Student Edit Karein</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteStudent()">🗑 Delete</button>
+  </div>
+
+</main>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeEditModal()">✕</button>
+    <div class="modal-title">✏️ Student Edit Karein</div>
+    <form id="editForm" onsubmit="saveEdit(event)">
+      <div class="form-group">
+        <label>Naam *</label>
+        <input type="text" id="e_name" required/>
+      </div>
+      <div class="form-group">
+        <label>Enrollment Number</label>
+        <input type="text" id="e_enrollment"/>
+      </div>
+      <div class="form-group">
+        <label>Current Semester *</label>
+        <select id="e_semester" required>
+          <option value="1">Semester 1</option>
+          <option value="2">Semester 2</option>
+          <option value="3">Semester 3</option>
+          <option value="4">Semester 4</option>
+          <option value="5">Semester 5</option>
+          <option value="6">Semester 6</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Contact / Email</label>
+        <input type="text" id="e_contact"/>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="globalToast"></div>
+
+<script src="app.js"></script>
+<script>
+  // ── INIT ────────────────────────────────────────
+  const params = new URLSearchParams(location.search);
+  const studentId = parseInt(params.get('id'));
+  let DB = loadDB();
+  let student = DB.students.find(s => s.id === studentId);
+
+  if (!student) {
+    document.body.innerHTML = `<div style="text-align:center;padding:80px 20px;color:#94a3b8">
+      <div style="font-size:60px;margin-bottom:16px">😕</div>
+      <h2>Student nahi mila</h2>
+      <a href="index.html" style="color:#60a5fa;text-decoration:none;margin-top:16px;display:inline-block">← Home par jao</a>
+    </div>`;
+  } else {
+    init();
+  }
+
+  function init() {
+    document.title = student.name + ' — EduTrack';
+    renderGlobalNavbar('student', { studentId: student.id });
+    const bName = document.getElementById('breadStudentName');
+    if (bName) bName.textContent = `${student.name} (Sem ${student.semester})`;
+    renderHero();
+    renderSubjects();
+    renderDocs();
+  }
+
+  // ── HERO ────────────────────────────────────────
+  function renderHero() {
+    const st = getStudentStats(student);
+    const color = getColor(student.colorIdx);
+    const glowColor = color + '88';
+    document.getElementById('heroSection').innerHTML = `
+      <div class="hero-avatar" style="background:${color};box-shadow:0 0 30px ${glowColor}">
+        ${getInitials(student.name)}
+      </div>
+      <div class="hero-info">
+        <h1 class="hero-name">${student.name}</h1>
+        <div class="hero-meta">
+          <span>BCA (IGNOU)</span>
+          <span>Semester ${student.semester}</span>
+          ${student.enrollment ? `<span>${student.enrollment}</span>` : ''}
+          ${student.contact ? `<span>${student.contact}</span>` : ''}
+        </div>
+        <div class="hero-pills">
+          <span class="pill pill-blue">📚 Total: ${st.total}</span>
+          <span class="pill pill-green">✅ Complete: ${st.fullyComplete}</span>
+          <span class="pill ${st.theoryPending > 0 ? 'pill-amber' : 'pill-green'}">📖 Theory Pending: ${st.theoryPending}</span>
+          <span class="pill ${st.assignPending > 0 ? 'pill-red' : 'pill-green'}">📝 Assign Pending: ${st.assignPending}</span>
+          <span class="pill pill-blue">📊 ${st.pct}% Done</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── SUBJECTS TAB ────────────────────────────────
+  function renderSubjects() {
+    const list = getSubjectList(student.semester);
+    const container = document.getElementById('subjectsList');
+    if (!list.length) {
+      container.innerHTML = '<div class="empty-state"><p>Is semester ke liye subjects nahi mile.</p></div>';
+      return;
+    }
+    container.innerHTML = list.map(sub => {
+      const status = student.subjects[sub.code] || { theory:'pending', assignment:'pending' };
+      const isFull  = status.theory === 'complete' && status.assignment === 'complete';
+      const isTA    = status.theory !== 'complete' && status.assignment === 'complete';
+      const isAP    = status.theory === 'complete'  && status.assignment !== 'complete';
+      const isBoth  = status.theory !== 'complete'  && status.assignment !== 'complete';
+
+      let rowClass = isFull ? 'done' : (isBoth ? 'none' : (isTA ? 'theory' : 'assign'));
+      let icon = isFull ? '✅' : (isBoth ? '⬜' : (isTA ? '⚠️' : '📝'));
+
+      const tDone = status.theory === 'complete';
+      const aDone = status.assignment === 'complete';
+
+      return `
+        <div class="subject-row ${rowClass}" id="row-${sub.code.replace(/[^a-z0-9]/gi,'_')}">
+          <span class="sub-icon">${icon}</span>
+          <div class="sub-body">
+            <div class="sub-code-name" onclick="openSubject('${sub.code}')">
+              <span class="sub-code">${sub.code}</span>
+              ${sub.name}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.4"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="sub-credits">💎 ${sub.credits} Credits</div>
+          </div>
+          <div class="sub-toggles">
+            <div class="toggle-row">
+              <span class="toggle-label">Theory:</span>
+              <button class="toggle-btn ${tDone ? 'on-green' : ''}" onclick="toggle('${sub.code}','theory','complete')">✅ Done</button>
+              <button class="toggle-btn ${!tDone ? 'on-amber' : ''}" onclick="toggle('${sub.code}','theory','pending')">⏳ Pending</button>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Assignment:</span>
+              <button class="toggle-btn ${aDone ? 'on-green' : ''}" onclick="toggle('${sub.code}','assignment','complete')">✅ Done</button>
+              <button class="toggle-btn ${!aDone ? 'on-red' : ''}" onclick="toggle('${sub.code}','assignment','pending')">❌ Pending</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function toggle(code, field, value) {
+    if (!student.subjects[code]) student.subjects[code] = { theory:'pending', assignment:'pending' };
+    student.subjects[code][field] = value;
+    // Update the student in DB
+    const idx = DB.students.findIndex(s => s.id === student.id);
+    if (idx !== -1) DB.students[idx] = student;
+    saveDB(DB);
+    renderHero();
+    renderSubjects();
+    showToast(`✅ ${code} ${field} updated!`);
+  }
+
+  function openSubject(code) {
+    window.open(`subject.html?student=${student.id}&subject=${encodeURIComponent(code)}`, '_blank');
+  }
+
+  // ── DOCS TAB ────────────────────────────────────
+  function renderDocs() {
+    const container = document.getElementById('docsSection');
+    if (!student.documents || student.documents.length === 0) {
+      container.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <p>Is student ke liye koi document nahi hai.</p>
+      </div>`;
+      return;
+    }
+    container.innerHTML = `<div class="docs-grid">` +
+      student.documents.map(doc => `
+        <div class="pdf-card">
+          <div class="pdf-icon">📋</div>
+          <div class="pdf-label">${doc.label}</div>
+          <div class="pdf-sub">PDF Document</div>
+          <button class="btn btn-primary btn-sm" onclick="openPDF('${doc.file.replace(/'/g,"\\'")}')">📂 Open PDF</button>
+        </div>
+      `).join('') +
+    `</div>`;
+  }
+
+  function openPDF(path) {
+    window.open(path, '_blank');
+  }
+
+  // ── TABS ────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('pane-' + tab).classList.add('active');
+  }
+
+  // ── EDIT MODAL ──────────────────────────────────
+  function openEditModal() {
+    document.getElementById('e_name').value = student.name;
+    document.getElementById('e_enrollment').value = student.enrollment || '';
+    document.getElementById('e_semester').value = student.semester;
+    document.getElementById('e_contact').value = student.contact || '';
+    document.getElementById('editModal').classList.add('open');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('open');
+  }
+
+  function saveEdit(e) {
+    e.preventDefault();
+    const newSem = parseInt(document.getElementById('e_semester').value);
+    const semChanged = newSem !== student.semester;
+    student.name = document.getElementById('e_name').value.trim();
+    student.enrollment = document.getElementById('e_enrollment').value.trim();
+    student.semester = newSem;
+    student.contact = document.getElementById('e_contact').value.trim();
+    if (semChanged) student.subjects = {};
+    const idx = DB.students.findIndex(s => s.id === student.id);
+    if (idx !== -1) DB.students[idx] = student;
+    saveDB(DB);
+    closeEditModal();
+    init();
+    showToast('✅ Student update ho gaya!');
+  }
+
+  // ── DELETE ──────────────────────────────────────
+  function deleteStudent() {
+    if (!confirm(`"${student.name}" ko permanently delete karna chahte hain?`)) return;
+    DB.students = DB.students.filter(s => s.id !== student.id);
+    saveDB(DB);
+    location.href = 'index.html';
+  }
+
+  // ── KEYBOARD ────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeEditModal();
+  });
+</script>
+</body>
+</html>

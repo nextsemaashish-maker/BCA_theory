@@ -1,0 +1,6 @@
+{
+  "name": "EduTrack BCA Tracker",
+  "description": "Ultra-premium dark glassmorphism IGNOU BCA student academic progress and documents tracker with live theory and assignment clearance tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
